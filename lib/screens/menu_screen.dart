@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 //Menu with 5 buttons [multi_player, single_player, how_to_play, game_info, settings]
 
 class MenuScreen extends StatelessWidget {
-  final String prefKey = 'NotFirstStart';
+  final String prefKey = 'NotFirstStart4';
 
   Future<bool> initPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,7 +27,7 @@ class MenuScreen extends StatelessWidget {
     initPref().then((bool value) {
       if(!value){
         print(value.toString());
-        navigateToHowToPlay(context);
+        navigateToHowToPlay(context, 'Skip');
         setNotFirstStart();
       }
     });
@@ -81,7 +81,7 @@ class MenuScreen extends StatelessWidget {
                       child: Text('How to play'),
                       textColor: Colors.white,
                       onPressed: () {
-                        navigateToHowToPlay(context);
+                        navigateToHowToPlay(context, 'Ok');
                       },
                     )),
               ),
@@ -134,10 +134,10 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  navigateToHowToPlay(BuildContext context) {
+  navigateToHowToPlay(BuildContext context, String buttonText) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => HowToPlay()),
+      MaterialPageRoute(builder: (context) => HowToPlay(buttonText)),
     );
   }
 
