@@ -4,12 +4,34 @@ import 'package:first_flutter_app/screens/multi_mode_screen.dart';
 import 'package:first_flutter_app/screens/settings_screen.dart';
 import 'package:first_flutter_app/screens/single_mode_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //Menu with 5 buttons [multi_player, single_player, how_to_play, game_info, settings]
 
 class MenuScreen extends StatelessWidget {
+  final String prefKey = 'NotFirstStart';
+
+  Future<bool> initPref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getKeys().contains(prefKey);
+  }
+
+  setNotFirstStart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(prefKey, true);
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    initPref().then((bool value) {
+      if(!value){
+        print(value.toString());
+        navigateToHowToPlay(context);
+        setNotFirstStart();
+      }
+    });
+
     return Scaffold(
       body: Container(
         color: Colors.blue[100],
@@ -26,6 +48,7 @@ class MenuScreen extends StatelessWidget {
                       padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
                       child: Text('Multiplayer'),
                       textColor: Colors.white,
+                      onPressed: null,
                     )),
               ),
               Padding(
