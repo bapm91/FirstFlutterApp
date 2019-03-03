@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 // [normal mode] - timer (200 sec)
 // [easy mode] - no timer
 
-class SinglePlayerScreen extends StatefulWidget {
+class SingleModeGameScreen extends StatefulWidget {
   @override
   State createState() {
-    return SinglePlayerScreenState();
+    return SingleModeGameScreenState();
   }
 }
 
-class SinglePlayerScreenState extends State<SinglePlayerScreen> {
+class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold();
