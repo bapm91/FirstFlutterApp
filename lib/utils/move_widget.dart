@@ -4,13 +4,20 @@ import 'package:flutter/material.dart';
 class MoveWidget extends StatelessWidget {
   final MoveModel moveModel;
 
+  final textSize = 20.0;
+
   const MoveWidget({this.moveModel}):assert(moveModel != null);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black54),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          color: Color(0x22000000)
+        ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.only(left: 18, top: 0, right: 18, bottom: 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -19,7 +26,7 @@ class MoveWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black54,
-              fontSize: 30,
+              fontSize: textSize,
               fontStyle: FontStyle.normal,
             ),
           ),
@@ -29,7 +36,7 @@ class MoveWidget extends StatelessWidget {
           Container(
             color: Colors.black54,
             width: 1,
-            height: 40,
+            height: 25,
           ),
           Container(
             width: 25,
@@ -39,7 +46,7 @@ class MoveWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black54,
-              fontSize: 30,
+              fontSize: textSize,
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -49,7 +56,7 @@ class MoveWidget extends StatelessWidget {
           Container(
             color: Colors.black54,
             width: 1,
-            height: 40,
+            height: 25,
           ),
           Container(
             width: 25,
@@ -59,7 +66,7 @@ class MoveWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black54,
-              fontSize: 30,
+              fontSize: textSize,
               fontStyle: FontStyle.italic,
             ),
           ),
