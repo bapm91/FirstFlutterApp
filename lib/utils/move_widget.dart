@@ -14,7 +14,7 @@ class MoveWidget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black54),
           borderRadius: BorderRadius.all(Radius.circular(8)),
-          color: Color(0x22000000)
+          color: Colors.grey[100]
         ),
       child: Padding(
         padding: EdgeInsets.only(left: 18, top: 0, right: 18, bottom: 0),

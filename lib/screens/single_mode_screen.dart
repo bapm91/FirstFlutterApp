@@ -3,6 +3,7 @@ import 'package:first_flutter_app/utils/move_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:responsive_container/responsive_container.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 // SinglePayer have some mode [easy_mode, normal_mode, hard_mode, pro_mode]
 // [pro_mode] - mode with out list of moves before
@@ -25,10 +26,10 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   final textSize = 20.0;
 
-  List<String> number = ['1', '5', '7', '0'];
+  List<String> number = getRandomNumber();
 
   List<bool> textActive = [false, false, false, false];
-  List<String> valueNewMove = ['1', '2', '8', '9'];
+  List<String> valueNewMove = [' ', ' ', ' ', ' '];
 
   @override
   void initState() {
@@ -37,14 +38,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     if (movesList == null) {
       movesList = List<MoveModel>();
     }
-
-    movesList.add(MoveModel('1', '1234'));
-    movesList.add(MoveModel('2', '2345'));
-    movesList.add(MoveModel('3', '3456'));
-    movesList.add(MoveModel('4', '4567'));
-    movesList.forEach((f) {
-      f.setMoveHint('2:0');
-    });
   }
 
   @override
@@ -59,11 +52,13 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
         body: Column(
 //            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Container(
-                height: 40,
+              ResponsiveContainer(
+                heightPercent: 5.0, //value percent of screen total height
+                widthPercent: 100.0,
               ),
-              Container(
-                height: 10,
+              ResponsiveContainer(
+                heightPercent: 1.0, //value percent of screen total height
+                widthPercent: 100.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -79,39 +74,44 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                   ],
                 ),
               ),
-              Container(
-                height: 5,
+              ResponsiveContainer(
+                heightPercent: 1.0, //value percent of screen total height
+                widthPercent: 100.0,
               ),
               ResponsiveContainer(
-                heightPercent: 70.0, //value percent of screen total height
-                widthPercent: 100.0,
-                child: ListView.builder(
-                  controller: _scrollController,
-//                  reverse: true,
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: movesList.length,
-                  itemBuilder: (context, position) {
-                    return Padding(
-                      padding: EdgeInsets.all(5),
-                      child: MoveWidget(moveModel: movesList[position]),
-                    );
-                  },
-                ),
+                  heightPercent: 70.0, //value percent of screen total height
+                  widthPercent: 100.0,
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: getClickedBorderColor(0)),
+                            borderRadius: BorderRadius.all(Radius.circular(11)),
+                            color: Colors.lightBlueAccent
+                        ),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: movesList.length,
+                          itemBuilder: (context, position) {
+                            return Padding(
+                              padding: EdgeInsets.all(5),
+                              child: MoveWidget(moveModel: movesList[position]),
+                            );
+                          },
+                        ),
+                      ),)
               ),
               ResponsiveContainer(
                 heightPercent: 0.1,
-                widthPercent: 90.0,
+                widthPercent: 100.0,
                 child: Container(
                   color: Colors.black54,
                   height: 1,
                 ),
               ),
-              /*ResponsiveContainer(
-                  heightPercent: 10.0, //value percent of screen total height
-                  widthPercent: 90.0,
-                  child: */
-              Container(
-                height: 40,
+              ResponsiveContainer(
+                heightPercent: 7.0, //value percent of screen total height
+                widthPercent: 100.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -123,114 +123,137 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                       },
                       tooltip: 'Clear',
                     ),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: getClickedBorderColor(0)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: getBackgroundColor(0)),
-                          child: Text(
-                            valueNewMove[0],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: getClickedTextColor(0),
-                              fontSize: textSize,
-                              fontStyle: FontStyle.italic,
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: InkWell(
+                          child: Container(
+                            width: 40,
+                            decoration: BoxDecoration(
+                                border:
+                                Border.all(color: getClickedBorderColor(0)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(11)),
+                                color: getBackgroundColor(0)),
+                            child: Center(
+                              child: Text(
+                                valueNewMove[0],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: getClickedTextColor(0),
+                                  fontSize: textSize,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            textActive[0] = !textActive[0];
-                            textActive[1] = false;
-                            textActive[2] = false;
-                            textActive[3] = false;
-                          });
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: getClickedBorderColor(1)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: getBackgroundColor(1)),
-                          child: Text(
-                            valueNewMove[1],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: getClickedTextColor(1),
-                              fontSize: textSize,
-                              fontStyle: FontStyle.italic,
+                          onTap: () {
+                            setState(() {
+                              textActive[0] = !textActive[0];
+                              textActive[1] = false;
+                              textActive[2] = false;
+                              textActive[3] = false;
+                            });
+                          }),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: InkWell(
+                          child: Container(
+                            width: 40,
+                            height: 35,
+                            decoration: BoxDecoration(
+                                border:
+                                Border.all(color: getClickedBorderColor(1)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(11)),
+                                color: getBackgroundColor(1)),
+                            child: Center(
+                              child: Text(
+                                valueNewMove[1],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: getClickedTextColor(1),
+                                  fontSize: textSize,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            textActive[1] = !textActive[1];
-                            textActive[0] = false;
-                            textActive[2] = false;
-                            textActive[3] = false;
-                          });
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: getClickedBorderColor(2)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: getBackgroundColor(2)),
-                          child: Text(
-                            valueNewMove[2],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: getClickedTextColor(2),
-                              fontSize: textSize,
-                              fontStyle: FontStyle.italic,
+                          onTap: () {
+                            setState(() {
+                              textActive[1] = !textActive[1];
+                              textActive[0] = false;
+                              textActive[2] = false;
+                              textActive[3] = false;
+                            });
+                          }),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: InkWell(
+                          child: Container(
+                            width: 40,
+                            height: 35,
+                            decoration: BoxDecoration(
+                                border:
+                                Border.all(color: getClickedBorderColor(2)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(11)),
+                                color: getBackgroundColor(2)),
+                            child: Center(
+                              child: Text(
+                                valueNewMove[2],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: getClickedTextColor(2),
+                                  fontSize: textSize,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            textActive[2] = !textActive[2];
-                            textActive[0] = false;
-                            textActive[1] = false;
-                            textActive[3] = false;
-                          });
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: getClickedBorderColor(3)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: getBackgroundColor(3)),
-                          child: Text(
-                            valueNewMove[3],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: getClickedTextColor(3),
-                              fontSize: textSize,
-                              fontStyle: FontStyle.italic,
+                          onTap: () {
+                            setState(() {
+                              textActive[2] = !textActive[2];
+                              textActive[0] = false;
+                              textActive[1] = false;
+                              textActive[3] = false;
+                            });
+                          }),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: InkWell(
+                          child: Container(
+                            width: 40,
+                            height: 35,
+                            decoration: BoxDecoration(
+                                border:
+                                Border.all(color: getClickedBorderColor(3)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(11)),
+                                color: getBackgroundColor(3)),
+                            child: Center(
+                              child: Text(
+                                valueNewMove[3],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: getClickedTextColor(3),
+                                  fontSize: textSize,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            textActive[3] = !textActive[3];
-                            textActive[0] = false;
-                            textActive[1] = false;
-                            textActive[2] = false;
-                          });
-                        }),
+                          onTap: () {
+                            setState(() {
+                              textActive[3] = !textActive[3];
+                              textActive[0] = false;
+                              textActive[1] = false;
+                              textActive[2] = false;
+                            });
+                          }),
+                    ),
                     IconButton(
                       icon: Icon(Icons.subdirectory_arrow_left),
                       onPressed: () {
@@ -243,19 +266,279 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
               ),
               ResponsiveContainer(
                 heightPercent: 0.1,
-                widthPercent: 90.0,
+                widthPercent: 100.0,
                 child: Container(
                   color: Colors.black54,
                   height: 1,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(15),
-                child: Row(),
+              ResponsiveContainer(
+                heightPercent: 2,
+                widthPercent: 100.0,
               ),
-              Container(
-                padding: EdgeInsets.all(15),
-                child: Row(),
+              ResponsiveContainer(
+                heightPercent: 6.0,
+                widthPercent: 100.0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '1',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(1);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '3',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(3);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '5',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(5);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '7',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(7);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '9',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(9);
+                        }),
+                    Container(
+                      width: 10,
+                    ),
+                  ],
+                ),
+              ),
+              ResponsiveContainer(
+                heightPercent: 6.0, //value percent of screen total height
+                widthPercent: 100.0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                    ),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '2',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(2);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '4',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(4);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '6',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(6);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '8',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(8);
+                        }),
+                    InkWell(
+                        child: Container(
+                          width: 40,
+                          height: 35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black54),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(11)),
+                              color: Color(0x22000000)),
+                          child: Center(
+                            child: Text(
+                              '0',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: textSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          setValueInNewMove(0);
+                        }),
+                  ],
+                ),
               )
             ]));
   }
@@ -267,14 +550,14 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   }
 
   checkMove() {
-
-    if(valueNewMove.contains(' ')){
-        _showSnackBar(context, 'Some cell are empty!');
+    if (valueNewMove.contains(' ')) {
+      _showSnackBar(context, 'Some cell are empty!');
       return;
     }
 
     MoveModel newMove = MoveModel((movesList.length + 1).toString(),
-        '${valueNewMove[0] + valueNewMove[1] + valueNewMove[2] + valueNewMove[3]}');
+        '${valueNewMove[0] + valueNewMove[1] + valueNewMove[2] +
+            valueNewMove[3]}');
 
     int repeatCount = 0;
     int rightPlaceCount = 0;
@@ -296,7 +579,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     });
 
     scroll();
-
   }
 
   void _showSnackBar(BuildContext context, String message) {
@@ -337,4 +619,32 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
       );
     });
   }
+
+  setValueInNewMove(int position) {
+    if (!textActive.contains(true)) return;
+
+    setState(() {
+      if (valueNewMove.contains(position.toString())) {
+        valueNewMove[valueNewMove.indexOf(position.toString())] = ' ';
+      }
+      valueNewMove[textActive.indexOf(true)] = position.toString();
+      textActive = [false, false, false, false];
+    });
+  }
+
+  static List<String> getRandomNumber() {
+    List<String> result = List();
+    result.add(Random().nextInt(10).toString());
+    for (int i = 0; i < 3; i++) {
+      String num;
+      do {
+        num = Random().nextInt(10).toString();
+      } while (result.contains(num));
+      result.add(num);
+    }
+
+    return result;
+  }
+
+  showStartAlert() {}
 }
