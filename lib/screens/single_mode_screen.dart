@@ -26,18 +26,27 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   final textSize = 20.0;
 
-  List<String> number = getRandomNumber();
+  DifficultyLevel level;
 
-  List<bool> textActive = [false, false, false, false];
-  List<String> valueNewMove = [' ', ' ', ' ', ' '];
+  List<String> number;
+
+  List<bool> textActive;
+  List<String> valueNewMove;
 
   @override
   void initState() {
     super.initState();
 
-    if (movesList == null) {
+    refreshAll();
+  }
+
+  void refreshAll() {
+    setState(() {
       movesList = List<MoveModel>();
-    }
+      textActive = [false, false, false, false];
+      valueNewMove = [' ', ' ', ' ', ' '];
+      number = getRandomNumber();
+    });
   }
 
   @override
@@ -82,25 +91,24 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                   heightPercent: 70.0, //value percent of screen total height
                   widthPercent: 100.0,
                   child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: getClickedBorderColor(0)),
-                            borderRadius: BorderRadius.all(Radius.circular(11)),
-                            color: Colors.lightBlueAccent
-                        ),
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: movesList.length,
-                          itemBuilder: (context, position) {
-                            return Padding(
-                              padding: EdgeInsets.all(5),
-                              child: MoveWidget(moveModel: movesList[position]),
-                            );
-                          },
-                        ),
-                      ),)
-              ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: getClickedBorderColor(0)),
+                          borderRadius: BorderRadius.all(Radius.circular(11)),
+                          color: Colors.lightBlueAccent),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: movesList.length,
+                        itemBuilder: (context, position) {
+                          return Padding(
+                            padding: EdgeInsets.all(5),
+                            child: MoveWidget(moveModel: movesList[position]),
+                          );
+                        },
+                      ),
+                    ),
+                  )),
               ResponsiveContainer(
                 heightPercent: 0.1,
                 widthPercent: 100.0,
@@ -130,9 +138,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                             width: 40,
                             decoration: BoxDecoration(
                                 border:
-                                Border.all(color: getClickedBorderColor(0)),
+                                    Border.all(color: getClickedBorderColor(0)),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(11)),
+                                    BorderRadius.all(Radius.circular(11)),
                                 color: getBackgroundColor(0)),
                             child: Center(
                               child: Text(
@@ -163,9 +171,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                             height: 35,
                             decoration: BoxDecoration(
                                 border:
-                                Border.all(color: getClickedBorderColor(1)),
+                                    Border.all(color: getClickedBorderColor(1)),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(11)),
+                                    BorderRadius.all(Radius.circular(11)),
                                 color: getBackgroundColor(1)),
                             child: Center(
                               child: Text(
@@ -196,9 +204,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                             height: 35,
                             decoration: BoxDecoration(
                                 border:
-                                Border.all(color: getClickedBorderColor(2)),
+                                    Border.all(color: getClickedBorderColor(2)),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(11)),
+                                    BorderRadius.all(Radius.circular(11)),
                                 color: getBackgroundColor(2)),
                             child: Center(
                               child: Text(
@@ -229,9 +237,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                             height: 35,
                             decoration: BoxDecoration(
                                 border:
-                                Border.all(color: getClickedBorderColor(3)),
+                                    Border.all(color: getClickedBorderColor(3)),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(11)),
+                                    BorderRadius.all(Radius.circular(11)),
                                 color: getBackgroundColor(3)),
                             child: Center(
                               child: Text(
@@ -289,7 +297,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -313,7 +321,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -337,7 +345,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -361,7 +369,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -385,7 +393,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -424,7 +432,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -448,7 +456,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -472,7 +480,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -496,7 +504,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -520,7 +528,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black54),
                               borderRadius:
-                              BorderRadius.all(Radius.circular(11)),
+                                  BorderRadius.all(Radius.circular(11)),
                               color: Color(0x22000000)),
                           child: Center(
                             child: Text(
@@ -556,8 +564,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     }
 
     MoveModel newMove = MoveModel((movesList.length + 1).toString(),
-        '${valueNewMove[0] + valueNewMove[1] + valueNewMove[2] +
-            valueNewMove[3]}');
+        '${valueNewMove[0] + valueNewMove[1] + valueNewMove[2] + valueNewMove[3]}');
 
     int repeatCount = 0;
     int rightPlaceCount = 0;
@@ -576,6 +583,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     setState(() {
       movesList.add(newMove);
       clearAllTextFields();
+      if (rightPlaceCount == 4) {
+        showWinAlert(context);
+      }
     });
 
     scroll();
@@ -646,5 +656,77 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     return result;
   }
 
-  showStartAlert() {}
+  void showStartAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Singleplayer"),
+          content: new Text("Choose your dificalty level?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Easy"),
+              onPressed: () {
+                level = DifficultyLevel.EASY;
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Normal"),
+              onPressed: () {
+                level = DifficultyLevel.NORMAL;
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Hard"),
+              onPressed: () {
+                level = DifficultyLevel.HARD;
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Pro"),
+              onPressed: () {
+                level = DifficultyLevel.PRO;
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showWinAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("You Win!", style: TextStyle(fontSize: 20)),
+          content: new Text("Play againe?", style: TextStyle(fontSize: 20)),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes", style: TextStyle(fontSize: 20)),
+              onPressed: () {
+                refreshAll();
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("No", style: TextStyle(fontSize: 20)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
