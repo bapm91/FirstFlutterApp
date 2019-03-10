@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 //Menu with 5 buttons [multi_player, single_player, how_to_play, game_info, settings]
 
 class MenuScreen extends StatelessWidget {
-  final String prefKey = 'NotFirstStart4';
+  final String prefKey = 'NotFirstStart';
+  final backgroundColor = Colors.blue[100];
 
   Future<bool> initPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -23,9 +24,8 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     initPref().then((bool value) {
-      if(!value){
+      if (!value) {
         print(value.toString());
         navigateToHowToPlay(context, 'Skip');
         setNotFirstStart();
@@ -34,87 +34,9 @@ class MenuScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        color: Colors.blue[100],
+        color: backgroundColor,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                child: ButtonTheme(
-                    minWidth: 200.0,
-                    height: 40.0,
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
-                      child: Text('Multiplayer'),
-                      textColor: Colors.white,
-                      onPressed: null,
-                    )),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                child: ButtonTheme(
-                    minWidth: 200.0,
-                    height: 40.0,
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
-                      child: Text('Singleplayer'),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        navigateToSingleModeGame(context);
-                      },
-                    )),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                  )),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                child: ButtonTheme(
-                    minWidth: 200.0,
-                    height: 40.0,
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
-                      child: Text('How to play'),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        navigateToHowToPlay(context, 'Ok');
-                      },
-                    )),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                child: ButtonTheme(
-                    minWidth: 200.0,
-                    height: 40.0,
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
-                      child: Text('Settings'),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        navigateToSettingsScreen(context);
-                      },
-                    )),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                child: ButtonTheme(
-                    minWidth: 200.0,
-                    height: 40.0,
-                    child: RaisedButton(
-                      padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
-                      child: Text('Game info'),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        navigateToInfo(context);
-                      },
-                    )),
-              ),
-            ],
-          ),
+          child: getButtons(context),
         ),
       ),
     );
@@ -152,6 +74,63 @@ class MenuScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SettingsScreen()),
+    );
+  }
+
+  Widget customStyledButton({String buttonText, VoidCallback onPressed}) {
+    return Padding(
+      padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+      child: ButtonTheme(
+          minWidth: 200.0,
+          height: 40.0,
+          child: RaisedButton(
+            padding: EdgeInsets.fromLTRB(45, 8, 45, 8),
+            child: Text(buttonText),
+            textColor: Colors.white,
+            onPressed: onPressed,
+          )),
+    );
+  }
+
+  getButtons(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        customStyledButton(
+          buttonText: 'Multiplayer',
+          onPressed: null,
+        ),
+        customStyledButton(
+          buttonText: 'Singleplayer',
+          onPressed: () {
+            navigateToSingleModeGame(context);
+          },
+        ),
+        Padding(
+            padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+            child: Container(
+              width: 40,
+              height: 40,
+            )),
+        customStyledButton(
+          buttonText: 'How to play',
+          onPressed: () {
+            navigateToHowToPlay(context, 'Ok');
+          },
+        ),
+        customStyledButton(
+          buttonText: 'Settings',
+          onPressed: () {
+            navigateToSettingsScreen(context);
+          },
+        ),
+        customStyledButton(
+          buttonText: 'Game info',
+          onPressed: () {
+            navigateToInfo(context);
+          },
+        ),
+      ],
     );
   }
 }
