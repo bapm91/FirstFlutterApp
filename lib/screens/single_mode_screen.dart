@@ -1,4 +1,5 @@
 import 'package:first_flutter_app/models/move_model.dart';
+import 'package:first_flutter_app/utils/drag_box.dart';
 import 'package:first_flutter_app/utils/move_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:responsive_container/responsive_container.dart';
@@ -26,25 +27,55 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   final textSize = 20.0;
 
+  List<DragBox> evenNumbersDragList;
+  List<DragBox> oddNumbersDragList;
+
+  List<String> valueNewMove;
+
   DifficultyLevel level;
 
   List<String> number;
 
-  List<bool> textActive;
-  List<String> valueNewMove;
-
   @override
   void initState() {
     super.initState();
-
     refreshAll();
+  }
+
+  void initKeys() {
+    evenNumbersDragList = [
+      DragBox('1'),
+      DragBox('3'),
+      DragBox('5'),
+      DragBox('7'),
+      DragBox('9')
+    ];
+    oddNumbersDragList = [
+      DragBox('2'),
+      DragBox('4'),
+      DragBox('6'),
+      DragBox('8'),
+      DragBox('0'),
+    ];
+    valueNewMove = [' ', ' ', ' ', ' '];
+  }
+
+  void refreshKeys() {
+    setState(() {
+      evenNumbersDragList.forEach((dragBox) {
+        dragBox.dragBoxState.setVisibility(true);
+      });
+      oddNumbersDragList.forEach((dragBox) {
+        dragBox.dragBoxState.setVisibility(true);
+      });
+      valueNewMove = [' ', ' ', ' ', ' '];
+    });
   }
 
   void refreshAll() {
     setState(() {
+      initKeys();
       movesList = List<MoveModel>();
-      textActive = [false, false, false, false];
-      valueNewMove = [' ', ' ', ' ', ' '];
       number = getRandomNumber();
     });
   }
@@ -58,503 +89,138 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
     return Scaffold(
         backgroundColor: Colors.blue[100],
-        body: Column(
-//            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              ResponsiveContainer(
-                heightPercent: 5.0, //value percent of screen total height
-                widthPercent: 100.0,
-              ),
-              ResponsiveContainer(
-                heightPercent: 1.0, //value percent of screen total height
-                widthPercent: 100.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text('№'),
-                    Container(
-                      width: 10,
-                    ),
-                    Text('Moves'),
-                    Container(
-                      width: 10,
-                    ),
-                    Text('Hint')
-                  ],
+        body: Column(children: <Widget>[
+          ResponsiveContainer(
+            heightPercent: 5.0,
+            widthPercent: 100.0,
+          ),
+          ResponsiveContainer(
+            heightPercent: 1.0,
+            widthPercent: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text('№'),
+                Container(
+                  width: 10,
                 ),
-              ),
-              ResponsiveContainer(
-                heightPercent: 1.0, //value percent of screen total height
-                widthPercent: 100.0,
-              ),
-              ResponsiveContainer(
-                  heightPercent: 70.0, //value percent of screen total height
-                  widthPercent: 100.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: getClickedBorderColor(0)),
-                          borderRadius: BorderRadius.all(Radius.circular(11)),
-                          color: Colors.lightBlueAccent),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: movesList.length,
-                        itemBuilder: (context, position) {
-                          return Padding(
-                            padding: EdgeInsets.all(5),
-                            child: MoveWidget(moveModel: movesList[position]),
-                          );
-                        },
-                      ),
-                    ),
-                  )),
-              ResponsiveContainer(
-                heightPercent: 0.1,
-                widthPercent: 100.0,
+                Text('Moves'),
+                Container(
+                  width: 10,
+                ),
+                Text('Hint')
+              ],
+            ),
+          ),
+          ResponsiveContainer(
+            heightPercent: 1.0,
+            widthPercent: 100.0,
+          ),
+          ResponsiveContainer(
+              heightPercent: 70.0,
+              widthPercent: 100.0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  color: Colors.black54,
-                  height: 1,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue[700]),
+                      borderRadius: BorderRadius.all(Radius.circular(11)),
+                      color: Colors.lightBlueAccent),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: movesList.length,
+                    itemBuilder: (context, position) {
+                      return Padding(
+                        padding: EdgeInsets.all(5),
+                        child: MoveWidget(moveModel: movesList[position]),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              ResponsiveContainer(
-                heightPercent: 7.0, //value percent of screen total height
-                widthPercent: 100.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    IconButton(
-                      iconSize: 24,
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        clearAllTextFields();
-                      },
-                      tooltip: 'Clear',
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: InkWell(
-                          child: Container(
-                            width: 40,
-                            decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: getClickedBorderColor(0)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(11)),
-                                color: getBackgroundColor(0)),
-                            child: Center(
-                              child: Text(
-                                valueNewMove[0],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: getClickedTextColor(0),
-                                  fontSize: textSize,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              textActive[0] = !textActive[0];
-                              textActive[1] = false;
-                              textActive[2] = false;
-                              textActive[3] = false;
-                            });
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: InkWell(
-                          child: Container(
-                            width: 40,
-                            height: 35,
-                            decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: getClickedBorderColor(1)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(11)),
-                                color: getBackgroundColor(1)),
-                            child: Center(
-                              child: Text(
-                                valueNewMove[1],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: getClickedTextColor(1),
-                                  fontSize: textSize,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              textActive[1] = !textActive[1];
-                              textActive[0] = false;
-                              textActive[2] = false;
-                              textActive[3] = false;
-                            });
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: InkWell(
-                          child: Container(
-                            width: 40,
-                            height: 35,
-                            decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: getClickedBorderColor(2)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(11)),
-                                color: getBackgroundColor(2)),
-                            child: Center(
-                              child: Text(
-                                valueNewMove[2],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: getClickedTextColor(2),
-                                  fontSize: textSize,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              textActive[2] = !textActive[2];
-                              textActive[0] = false;
-                              textActive[1] = false;
-                              textActive[3] = false;
-                            });
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: InkWell(
-                          child: Container(
-                            width: 40,
-                            height: 35,
-                            decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: getClickedBorderColor(3)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(11)),
-                                color: getBackgroundColor(3)),
-                            child: Center(
-                              child: Text(
-                                valueNewMove[3],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: getClickedTextColor(3),
-                                  fontSize: textSize,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              textActive[3] = !textActive[3];
-                              textActive[0] = false;
-                              textActive[1] = false;
-                              textActive[2] = false;
-                            });
-                          }),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.subdirectory_arrow_left),
-                      onPressed: () {
-                        checkMove();
-                      },
-                      tooltip: 'Check',
-                    )
-                  ],
+              )),
+          ResponsiveContainer(
+            heightPercent: 0.1,
+            widthPercent: 100.0,
+            child: Container(
+              color: Colors.black54,
+              height: 1,
+            ),
+          ),
+          ResponsiveContainer(
+            heightPercent: 7.0, //value percent of screen total height
+            widthPercent: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                IconButton(
+                  iconSize: 24,
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    refreshKeys();
+                  },
+                  tooltip: 'Clear',
                 ),
-              ),
-              ResponsiveContainer(
-                heightPercent: 0.1,
-                widthPercent: 100.0,
-                child: Container(
-                  color: Colors.black54,
-                  height: 1,
+                dragTargetWidget(0),
+                dragTargetWidget(1),
+                dragTargetWidget(2),
+                dragTargetWidget(3),
+                IconButton(
+                  icon: Icon(Icons.subdirectory_arrow_left),
+                  onPressed: () {
+                    checkMove();
+                  },
+                  tooltip: 'Check',
+                )
+              ],
+            ),
+          ),
+          ResponsiveContainer(
+            heightPercent: 0.1,
+            widthPercent: 100.0,
+            child: Container(
+              color: Colors.black54,
+              height: 1,
+            ),
+          ),
+          ResponsiveContainer(
+            heightPercent: 2,
+            widthPercent: 100.0,
+          ),
+          ResponsiveContainer(
+            heightPercent: 6.0,
+            widthPercent: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                evenNumbersDragList[0],
+                evenNumbersDragList[1],
+                evenNumbersDragList[2],
+                evenNumbersDragList[3],
+                evenNumbersDragList[4],
+                Container(
+                  width: 10,
                 ),
-              ),
-              ResponsiveContainer(
-                heightPercent: 2,
-                widthPercent: 100.0,
-              ),
-              ResponsiveContainer(
-                heightPercent: 6.0,
-                widthPercent: 100.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '1',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(1);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '3',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(3);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '5',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(5);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '7',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(7);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '9',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(9);
-                        }),
-                    Container(
-                      width: 10,
-                    ),
-                  ],
+              ],
+            ),
+          ),
+          ResponsiveContainer(
+            heightPercent: 6.0, //value percent of screen total height
+            widthPercent: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Container(
+                  width: 10,
                 ),
-              ),
-              ResponsiveContainer(
-                heightPercent: 6.0, //value percent of screen total height
-                widthPercent: 100.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                    ),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '2',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(2);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '4',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(4);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '6',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(6);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '8',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(8);
-                        }),
-                    InkWell(
-                        child: Container(
-                          width: 40,
-                          height: 35,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(11)),
-                              color: Color(0x22000000)),
-                          child: Center(
-                            child: Text(
-                              '0',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: textSize,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          setValueInNewMove(0);
-                        }),
-                  ],
-                ),
-              )
-            ]));
-  }
-
-  clearAllTextFields() {
-    setState(() {
-      valueNewMove = [' ', ' ', ' ', ' '];
-    });
+                oddNumbersDragList[0],
+                oddNumbersDragList[1],
+                oddNumbersDragList[2],
+                oddNumbersDragList[3],
+                oddNumbersDragList[4]
+              ],
+            ),
+          )
+        ]));
   }
 
   checkMove() {
@@ -582,7 +248,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
     setState(() {
       movesList.add(newMove);
-      clearAllTextFields();
+      refreshKeys();
       if (rightPlaceCount == 4) {
         showWinAlert(context);
       }
@@ -592,32 +258,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   }
 
   void _showSnackBar(BuildContext context, String message) {
+    // TODO call this method rightly
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
-  }
-
-  getClickedTextColor(int position) {
-    if (textActive[position]) {
-      return Colors.white;
-    } else {
-      return Colors.black54;
-    }
-  }
-
-  getClickedBorderColor(int position) {
-    if (textActive[position]) {
-      return Colors.blue[700];
-    } else {
-      return Colors.black54;
-    }
-  }
-
-  getBackgroundColor(int position) {
-    if (textActive[position]) {
-      return Colors.blue[300];
-    } else {
-      return Color(0x22000000);
-    }
   }
 
   scroll() async {
@@ -627,18 +270,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 300),
       );
-    });
-  }
-
-  setValueInNewMove(int position) {
-    if (!textActive.contains(true)) return;
-
-    setState(() {
-      if (valueNewMove.contains(position.toString())) {
-        valueNewMove[valueNewMove.indexOf(position.toString())] = ' ';
-      }
-      valueNewMove[textActive.indexOf(true)] = position.toString();
-      textActive = [false, false, false, false];
     });
   }
 
@@ -657,47 +288,50 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   }
 
   void showStartAlert(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Singleplayer"),
-          content: new Text("Choose your dificalty level?"),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Easy"),
-              onPressed: () {
-                level = DifficultyLevel.EASY;
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text("Normal"),
-              onPressed: () {
-                level = DifficultyLevel.NORMAL;
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text("Hard"),
-              onPressed: () {
-                level = DifficultyLevel.HARD;
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text("Pro"),
-              onPressed: () {
-                level = DifficultyLevel.PRO;
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    //TODO call this method rightly
+    setState(() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            title: new Text("Singleplayer"),
+            content: new Text("Choose your dificalty level?"),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text("Easy"),
+                onPressed: () {
+                  level = DifficultyLevel.EASY;
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text("Normal"),
+                onPressed: () {
+                  level = DifficultyLevel.NORMAL;
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text("Hard"),
+                onPressed: () {
+                  level = DifficultyLevel.HARD;
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text("Pro"),
+                onPressed: () {
+                  level = DifficultyLevel.PRO;
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 
   void showWinAlert(BuildContext context) {
@@ -725,6 +359,68 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget dragTargetWidget(int index) {
+    return DragTarget(
+      onAccept: (String data) {
+        if (valueNewMove[index] != ' ') {
+          for (int i = 0; i < evenNumbersDragList.length; i++) {
+            if (valueNewMove[index] == evenNumbersDragList[i].label) {
+              evenNumbersDragList[i].dragBoxState.setVisibility(true);
+              valueNewMove[index] = data;
+            }
+          }
+        }
+
+        if (valueNewMove[index] != data) {
+          for (int i = 0; i < oddNumbersDragList.length; i++) {
+            if (valueNewMove[index] == oddNumbersDragList[i].label) {
+              oddNumbersDragList[i].dragBoxState.setVisibility(true);
+            }
+          }
+        }
+
+        valueNewMove[index] = data;
+      },
+      builder: (
+        context,
+        accepted,
+        rejected,
+      ) {
+        return Container(
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: valueNewMove[index] != ' '
+                ? Container(
+                    width: 40.0,
+                    height: 60.0,
+                    decoration: oddNumbersDragList[index]
+                        .dragBoxState
+                        .getSimpleDecoration(),
+                    child: Center(
+                      child: Text(
+                        accepted.isEmpty ? valueNewMove[index] : " ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22.0,
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(
+                    color: Colors.transparent,
+                    child: Center(
+                      child:
+                          oddNumbersDragList[index].dragBoxState.getDotPoint(),
+                    ),
+                  ),
+          ),
         );
       },
     );
