@@ -29,47 +29,39 @@ class DragBoxState extends State<DragBox> {
 
   @override
   Widget build(BuildContext context) {
-    return visibility
-        ? Draggable(
+    return !visibility
+        ? getDotPoint()
+        : Draggable(
             data: widget.label,
-            child: Container(
-              width: 40.0,
-              height: 35.0,
-              decoration: getSimpleDecoration(),
-              child: Center(
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    decoration: TextDecoration.none,
-                    fontSize: 20.0,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildBox(
+                boxHeight: 35, boxWidth: 40, textColor: Colors.black54),
+            feedback:
+                _buildBox(boxHeight: 50, boxWidth: 50, textColor: Colors.white),
             onDragCompleted: () {
               setState(() {
                 visibility = !visibility;
               });
             },
             childWhenDragging: getDotPoint(),
-            feedback: Container(
-              width: 50.0,
-              height: 50.0,
-              decoration: getSimpleDecoration(),
-              child: Center(
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: Colors.white,
-                    decoration: TextDecoration.none,
-                    fontSize: 18.0,
-                  ),
-                ),
-              ),
-            ),
-          )
-        : getDotPoint();
+          );
+  }
+
+  _buildBox({double boxHeight, double boxWidth, Color textColor}) {
+    return Container(
+      width: boxWidth,
+      height: boxHeight,
+      decoration: getSimpleDecoration(),
+      child: Center(
+        child: Text(
+          widget.label,
+          style: TextStyle(
+            color: textColor,
+            decoration: TextDecoration.none,
+            fontSize: 20.0,
+          ),
+        ),
+      ),
+    );
   }
 
   getSimpleDecoration() {
