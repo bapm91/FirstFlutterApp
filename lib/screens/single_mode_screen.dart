@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 // SinglePayer have some mode [easy_mode, normal_mode, hard_mode, pro_mode]
-// [pro_mode] - mode with out list of moves before
+// [pro_mode] - mode with timer (100 sec) and with out list of moves before
+// [master] - mode with out timer and with out list of moves before
 // [hard_mode] - with timer (100 sec)
 // [normal mode] - timer (200 sec)
 // [easy mode] - no timer
 
-enum DifficultyLevel { EASY, NORMAL, HARD, PRO }
+enum DifficultyLevel { EASY, NORMAL, HARD, MASTER, PRO}
 
 class SingleModeGameScreen extends StatefulWidget {
   @override
@@ -317,6 +318,13 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                 child: new Text("Hard"),
                 onPressed: () {
                   level = DifficultyLevel.HARD;
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text("Master"),
+                onPressed: () {
+                  level = DifficultyLevel.MASTER;
                   Navigator.of(context).pop();
                 },
               ),
