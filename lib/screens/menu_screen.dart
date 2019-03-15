@@ -8,7 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 //Menu with 5 buttons [multi_player, single_player, how_to_play, game_info, settings]
 
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return MenuScreenState();
+  }
+}
+
+class MenuScreenState extends State<MenuScreen> {
   final String prefKey = 'NotFirstStart';
   final backgroundColor = Colors.blue[100];
 
@@ -49,10 +56,10 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  navigateToSingleModeGame(BuildContext context) {
+  navigateToSingleModeGame(BuildContext context, DifficultyLevel level) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SingleModeGameScreen()),
+      MaterialPageRoute(builder: (context) => SinglePlayerMode(level: level)),
     );
   }
 
@@ -103,7 +110,7 @@ class MenuScreen extends StatelessWidget {
         customStyledButton(
           buttonText: 'Singleplayer',
           onPressed: () {
-            navigateToSingleModeGame(context);
+            showDifficultyAlert();
           },
         ),
         Padding(
@@ -132,5 +139,99 @@ class MenuScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  DifficultyLevel currentLevel;
+
+  showDifficultyAlert() {
+    List<DropdownMenuItem<DifficultyLevel>> _dropDownMenuItems =
+        getDropDownMenuItems();
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(9)),
+              side: BorderSide(
+                  color: Colors.blue[800], width: 2, style: BorderStyle.solid)),
+          title: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(9), topRight: Radius.circular(9)),
+                gradient: LinearGradient(
+                    colors: <Color>[Colors.blue[900], Colors.blue[100]])),
+            child: Text(
+              "Singleplayer",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          content: Container(
+            height: 80,
+              color: Colors.grey[300],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    height: 10,
+                  ),
+                  new Text(
+                    "Choose your difficulty level?",
+                    style: TextStyle(color: Colors.blue[900]),
+                  ),
+                  DropdownButton(
+//                  value: currentLevel,
+                    items: _dropDownMenuItems,
+                    onChanged: (DifficultyLevel level) {
+                      setState(() {
+                        currentLevel = level;
+                      });
+                    },
+                  )
+                ],
+              ),
+            ),
+          actions: <Widget>[
+            new FlatButton(
+              child: Text("Start"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                navigateToSingleModeGame(context, currentLevel);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<DropdownMenuItem<DifficultyLevel>> getDropDownMenuItems() {
+    List<DropdownMenuItem<DifficultyLevel>> items = List();
+    for (DifficultyLevel level in DifficultyLevel.values) {
+// here we are creating the drop down menu items, you can customize the item right here
+// but I'll just use a simple text for this
+      items.add(DropdownMenuItem(
+        value: level,
+        child: Text(getLevelText(level)),
+      ));
+    }
+    return items;
+  }
+
+  String getLevelText(DifficultyLevel level) {
+    if (level == DifficultyLevel.NORMAL) {
+      return 'Normal';
+    } else if (level == DifficultyLevel.HARD) {
+      return 'Hard';
+    } else if (level == DifficultyLevel.MASTER) {
+      return 'Master';
+    } else if (level == DifficultyLevel.PRO) {
+      return 'Pro';
+    } else {
+      return 'Easy';
+    }
   }
 }
