@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:first_flutter_app/models/move_model.dart';
 import 'package:first_flutter_app/utils/drag_box.dart';
 import 'package:first_flutter_app/utils/move_widget.dart';
@@ -48,6 +50,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   List<MoveModel> movesList;
   ScrollController _scrollController = new ScrollController();
 
+  Timer _timer;
+  int _startingTime;
+
   final textSize = 20.0;
 
   List<DragBox> evenNumbersDragList;
@@ -63,6 +68,23 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     initKeys();
     movesList = List<MoveModel>();
     number = getRandomNumber();
+
+    _setTime();
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+        oneSec,
+            (Timer timer) =>
+            setState(() {
+              if (_startingTime < 1) {
+                timer.cancel();
+                showWinLooseAlert(context, false);
+              } else {
+                _startingTime = _startingTime - 1;
+              }
+            }));
   }
 
   void initKeys() {
@@ -116,7 +138,17 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
           ResponsiveContainer(
             heightPercent: 5.0,
             widthPercent: 100.0,
-            child: Text(widget.level.toString()),
+          ),
+          ResponsiveContainer(
+            heightPercent: 5.0,
+            widthPercent: 100.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Text("Time : "),
+                Text(_startingTime.toString()),
+              ],
+            ),
           ),
           ResponsiveContainer(
             heightPercent: 1.0,
@@ -141,7 +173,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
             widthPercent: 100.0,
           ),
           ResponsiveContainer(
-              heightPercent: 70.0,
+              heightPercent: 65.0,
               widthPercent: 100.0,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -274,7 +306,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
       movesList.add(newMove);
       refreshKeys();
       if (rightPlaceCount == 4) {
-        showWinAlert(context);
+        showWinLooseAlert(context, true);
       }
     });
 
@@ -305,14 +337,24 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     return result;
   }
 
-  void showWinAlert(BuildContext context) {
+  void showWinLooseAlert(BuildContext context, bool isWin) {
+    if(_timer != null){
+      _timer.cancel();
+      _timer = null;
+    }
+
+    var winningVariation = number[0] + number[1] + number[2] + number[3];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("You Win!", style: TextStyle(fontSize: 20)),
-          content: new Text("Play againe?", style: TextStyle(fontSize: 20)),
+          title: new Text(
+              isWin? "You Win!": "You Loose!",
+              style: TextStyle(fontSize: 20)),
+          content: new Text("The winning variation is $winningVariation"
+              "\n\nPlay againe?", style: TextStyle(fontSize: 20)),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
@@ -320,6 +362,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
               onPressed: () {
                 refreshAll();
                 Navigator.of(context).pop();
+                _setTime();
               },
             ),
             new FlatButton(
@@ -366,6 +409,10 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
         }
 
         valueNewMove[index] = data;
+
+        if(_timer == null) {
+          startTimer();
+        }
       },
       builder: (
         context,
@@ -405,5 +452,19 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
         );
       },
     );
+  }
+
+  void _setTime() {
+    if(widget.level == null) return;
+
+    if(widget.level == DifficultyLevel.NORMAL){
+      _startingTime = 150;
+    }
+    if(widget.level == DifficultyLevel.HARD){
+      _startingTime = 70;
+    }
+    if(widget.level == DifficultyLevel.PRO){
+      _startingTime = 60;
+    }
   }
 }
