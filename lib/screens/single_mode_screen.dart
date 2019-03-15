@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:responsive_container/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:vibrate/vibrate.dart';
+import 'dart:io' show Platform;
+import 'package:audioplayers/audio_cache.dart';
 
 // SinglePayer have some mode [easy_mode, normal_mode, hard_mode, pro_mode]
 // [pro_mode] - mode with timer (100 sec) and with out list of moves before
@@ -50,6 +53,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   List<MoveModel> movesList;
   ScrollController _scrollController = new ScrollController();
 
+  bool canVibrate = Platform.isAndroid;
+  static AudioCache player = new AudioCache();
+
   Timer _timer;
   int _startingTime;
 
@@ -69,8 +75,13 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     initKeys();
     movesList = List<MoveModel>();
     number = getRandomNumber();
+    canDeviceVibrate();
 
     _setTime();
+  }
+
+  canDeviceVibrate() async {
+    canVibrate = await Vibrate.canVibrate;
   }
 
   void startTimer() {
@@ -383,6 +394,10 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
       _timer = null;
     }
 
+    if (canVibrate) {
+      Vibrate.vibrate();
+    }
+
     var winningVariation = number[0] + number[1] + number[2] + number[3];
 
     showDialog(
@@ -391,7 +406,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text(isWin ? "You Win!" : "You Loose!",
+          title: new Text(isWin ? "Great! You Win!" : "Time out! You Loose!",
               style: TextStyle(fontSize: 20)),
           content: new Text(
               "The winning variation is $winningVariation"
@@ -433,6 +448,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   Widget dragTargetWidget(int index) {
     return DragTarget(
       onAccept: (String data) {
+
+        player.play('drag_down.mp3');
+
         if (valueNewMove[index] != ' ') {
           for (int i = 0; i < evenNumbersDragList.length; i++) {
             if (valueNewMove[index] == evenNumbersDragList[i].label) {
