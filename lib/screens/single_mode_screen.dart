@@ -54,6 +54,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   int _startingTime;
 
   final textSize = 20.0;
+  String lastHint = '';
 
   List<DragBox> evenNumbersDragList;
   List<DragBox> oddNumbersDragList;
@@ -76,8 +77,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
         oneSec,
-            (Timer timer) =>
-            setState(() {
+        (Timer timer) => setState(() {
               if (_startingTime < 1) {
                 timer.cancel();
                 showWinLooseAlert(context, false);
@@ -119,6 +119,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   void refreshAll() {
     setState(() {
+      lastHint = '';
       refreshKeys();
       movesList = List<MoveModel>();
       number = getRandomNumber();
@@ -146,7 +147,11 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Text("Time : "),
-                Text(_startingTime.toString()),
+                AnimatedSwitcher(
+                  child: Text("${_startingTime.toString()}",
+                      key: ValueKey(_startingTime)),
+                  duration: Duration(milliseconds: 200),
+                )
               ],
             ),
           ),
@@ -178,21 +183,55 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue[700]),
-                      borderRadius: BorderRadius.all(Radius.circular(11)),
-                      color: Colors.lightBlueAccent),
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: movesList.length,
-                    itemBuilder: (context, position) {
-                      return Padding(
-                        padding: EdgeInsets.all(5),
-                        child: MoveWidget(moveModel: movesList[position]),
-                      );
-                    },
-                  ),
-                ),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue[700]),
+                        borderRadius: BorderRadius.all(Radius.circular(11)),
+                        color: Colors.lightBlueAccent),
+                    child: Wrap(
+                      children: <Widget>[
+                        ResponsiveContainer(
+                          heightPercent: 49.0,
+                          widthPercent: 100.0,
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: movesList.length,
+                            itemBuilder: (context, position) {
+                              return Padding(
+                                padding: EdgeInsets.all(5),
+                                child:
+                                    MoveWidget(moveModel: movesList[position]),
+                              );
+                            },
+                          ),
+                        ),
+                        ResponsiveContainer(
+                          heightPercent: 0.1,
+                          widthPercent: 100.0,
+                          child: Container(
+                            height: 1,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        ResponsiveContainer(
+                            heightPercent: 15.0,
+                            widthPercent: 100.0,
+                            child: Container(
+                                height: 40,
+                                alignment: Alignment.center,
+                                child: AnimatedSwitcher(
+                                  child: Text(
+                                    "$lastHint",
+                                    key: ValueKey(lastHint),
+                                    style: TextStyle(
+                                      color: Colors.grey[300],
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  duration: Duration(milliseconds: 200),
+                                )))
+                      ],
+                    )),
               )),
           ResponsiveContainer(
             heightPercent: 0.1,
@@ -301,6 +340,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     });
 
     newMove.setMoveHint('$repeatCount:$rightPlaceCount');
+    lastHint = newMove.getMoveHint;
 
     setState(() {
       movesList.add(newMove);
@@ -338,7 +378,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   }
 
   void showWinLooseAlert(BuildContext context, bool isWin) {
-    if(_timer != null){
+    if (_timer != null) {
       _timer.cancel();
       _timer = null;
     }
@@ -346,15 +386,17 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     var winningVariation = number[0] + number[1] + number[2] + number[3];
 
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text(
-              isWin? "You Win!": "You Loose!",
+          title: new Text(isWin ? "You Win!" : "You Loose!",
               style: TextStyle(fontSize: 20)),
-          content: new Text("The winning variation is $winningVariation"
-              "\n\nPlay againe?", style: TextStyle(fontSize: 20)),
+          content: new Text(
+              "The winning variation is $winningVariation"
+              "\n\nPlay againe?",
+              style: TextStyle(fontSize: 20)),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
@@ -410,7 +452,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
         valueNewMove[index] = data;
 
-        if(_timer == null) {
+        if (_timer == null) {
           startTimer();
         }
       },
@@ -455,15 +497,15 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   }
 
   void _setTime() {
-    if(widget.level == null) return;
+    if (widget.level == null) return;
 
-    if(widget.level == DifficultyLevel.NORMAL){
+    if (widget.level == DifficultyLevel.NORMAL) {
       _startingTime = 150;
     }
-    if(widget.level == DifficultyLevel.HARD){
+    if (widget.level == DifficultyLevel.HARD) {
       _startingTime = 70;
     }
-    if(widget.level == DifficultyLevel.PRO){
+    if (widget.level == DifficultyLevel.PRO) {
       _startingTime = 60;
     }
   }
