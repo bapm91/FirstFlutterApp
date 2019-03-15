@@ -13,9 +13,31 @@ import 'dart:math';
 // [normal mode] - timer (200 sec)
 // [easy mode] - no timer
 
-enum DifficultyLevel { EASY, NORMAL, HARD, MASTER, PRO}
+enum DifficultyLevel { EASY, NORMAL, HARD, MASTER, PRO }
+
+class SinglePlayerMode extends StatelessWidget {
+  final level;
+
+  SinglePlayerMode({Key key, this.level}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Flutter',
+      debugShowCheckedModeBanner: false,
+      theme: new ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: new Scaffold(body: new SingleModeGameScreen(level: level)),
+    );
+  }
+}
 
 class SingleModeGameScreen extends StatefulWidget {
+  final level;
+
+  SingleModeGameScreen({Key key, this.level}) : super(key: key);
+
   @override
   State createState() {
     return SingleModeGameScreenState();
@@ -33,14 +55,14 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   List<String> valueNewMove;
 
-  DifficultyLevel level;
-
   List<String> number;
 
   @override
   void initState() {
     super.initState();
-    refreshAll();
+    initKeys();
+    movesList = List<MoveModel>();
+    number = getRandomNumber();
   }
 
   void initKeys() {
@@ -75,7 +97,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
 
   void refreshAll() {
     setState(() {
-      initKeys();
+      refreshKeys();
       movesList = List<MoveModel>();
       number = getRandomNumber();
     });
@@ -94,6 +116,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
           ResponsiveContainer(
             heightPercent: 5.0,
             widthPercent: 100.0,
+            child: Text(widget.level.toString()),
           ),
           ResponsiveContainer(
             heightPercent: 1.0,
@@ -168,7 +191,7 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
                 IconButton(
                   icon: Icon(Icons.subdirectory_arrow_left),
                   onPressed: () {
-                    checkMove();
+                    checkMove(context);
                   },
                   tooltip: 'Check',
                 )
@@ -224,9 +247,9 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
         ]));
   }
 
-  checkMove() {
+  checkMove(BuildContext context) {
     if (valueNewMove.contains(' ')) {
-      _showSnackBar(context, 'Some cell are empty!');
+      _showInSnackBar('Some cell are empty!');
       return;
     }
 
@@ -258,12 +281,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     scroll();
   }
 
-  void _showSnackBar(BuildContext context, String message) {
-    // TODO call this method rightly
-    final snackBar = SnackBar(content: Text(message));
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
-
   scroll() async {
     Future.delayed(const Duration(milliseconds: 40), () {
       _scrollController.animateTo(
@@ -286,60 +303,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     }
 
     return result;
-  }
-
-  void showStartAlert(BuildContext context) {
-    //TODO call this method rightly
-    setState(() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          // return object of type Dialog
-          return AlertDialog(
-            title: new Text("Singleplayer"),
-            content: new Text("Choose your dificalty level?"),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text("Easy"),
-                onPressed: () {
-                  level = DifficultyLevel.EASY;
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text("Normal"),
-                onPressed: () {
-                  level = DifficultyLevel.NORMAL;
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text("Hard"),
-                onPressed: () {
-                  level = DifficultyLevel.HARD;
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text("Master"),
-                onPressed: () {
-                  level = DifficultyLevel.MASTER;
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text("Pro"),
-                onPressed: () {
-                  level = DifficultyLevel.PRO;
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    });
   }
 
   void showWinAlert(BuildContext context) {
@@ -369,6 +332,16 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
           ],
         );
       },
+    );
+  }
+
+  _showInSnackBar(String message) {
+    Scaffold.of(context).showSnackBar(
+      new SnackBar(
+        content: new Text(message),
+        backgroundColor: Colors.blue[400],
+        duration: Duration(seconds: 1),
+      ),
     );
   }
 
