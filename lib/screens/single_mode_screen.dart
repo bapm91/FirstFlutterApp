@@ -351,10 +351,17 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
     });
 
     newMove.setMoveHint('$repeatCount:$rightPlaceCount');
-    lastHint = newMove.getMoveHint;
+    if(widget.level != DifficultyLevel.PRO) {
+      lastHint = "${newMove.moveOffer} - ${newMove.getMoveHint}";
+    } else {
+      lastHint = newMove.getMoveHint;
+    }
 
     setState(() {
-      movesList.add(newMove);
+      if (widget.level != DifficultyLevel.PRO &&
+          widget.level != DifficultyLevel.MASTER) {
+        movesList.add(newMove);
+      }
       refreshKeys();
       if (rightPlaceCount == 4) {
         showWinLooseAlert(context, true);
@@ -448,7 +455,6 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
   Widget dragTargetWidget(int index) {
     return DragTarget(
       onAccept: (String data) {
-
         player.play('drag_down.mp3');
 
         if (valueNewMove[index] != ' ') {
@@ -521,10 +527,10 @@ class SingleModeGameScreenState extends State<SingleModeGameScreen> {
       _startingTime = 150;
     }
     if (widget.level == DifficultyLevel.HARD) {
-      _startingTime = 70;
+      _startingTime = 80;
     }
     if (widget.level == DifficultyLevel.PRO) {
-      _startingTime = 60;
+      _startingTime = 70;
     }
   }
 }

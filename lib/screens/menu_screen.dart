@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:first_flutter_app/screens/game_info_screen.dart';
 import 'package:first_flutter_app/screens/how_to_play_screen.dart';
 import 'package:first_flutter_app/screens/multi_mode_screen.dart';
@@ -21,7 +23,12 @@ class MenuScreenState extends State<MenuScreen> {
 
   Future<bool> initPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getKeys().contains(prefKey);
+    if (prefs.getKeys() != null &&
+        prefs.getKeys().contains(prefKey) == true &&
+        prefs.getBool(prefKey) != false) {
+      return true;
+    }
+    return false;
   }
 
   setNotFirstStart() async {
@@ -32,10 +39,10 @@ class MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     initPref().then((bool value) {
+      print('======================$value');
       if (!value) {
-        print(value.toString());
-        navigateToHowToPlay(context, 'Skip');
         setNotFirstStart();
+        navigateToHowToPlay(context, 'Skip');
       }
     });
 
@@ -141,7 +148,7 @@ class MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  DifficultyLevel currentLevel;
+  DifficultyLevel currentLevel = DifficultyLevel.EASY;
 
   showDifficultyAlert() {
     List<DropdownMenuItem<DifficultyLevel>> _dropDownMenuItems =
@@ -171,29 +178,31 @@ class MenuScreenState extends State<MenuScreen> {
           ),
           content: Container(
             height: 80,
-              color: Colors.grey[300],
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    height: 10,
-                  ),
-                  new Text(
-                    "Choose your difficulty level?",
-                    style: TextStyle(color: Colors.blue[900]),
-                  ),
-                  DropdownButton(
-//                  value: currentLevel,
-                    items: _dropDownMenuItems,
-                    onChanged: (DifficultyLevel level) {
-                      setState(() {
-                        currentLevel = level;
-                      });
-                    },
-                  )
-                ],
-              ),
+            color: Colors.grey[300],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 10,
+                ),
+                new Text(
+                  "Choose your difficulty level?",
+                  style: TextStyle(color: Colors.blue[900]),
+                ),
+                DropdownButton(
+                  value: currentLevel,
+                  items: _dropDownMenuItems,
+                  onChanged: (DifficultyLevel level) {
+                    setState(() {
+                      currentLevel = level;
+                      Navigator.of(context).pop();
+                      showDifficultyAlert();
+                    });
+                  },
+                )
+              ],
             ),
+          ),
           actions: <Widget>[
             new FlatButton(
               child: Text("Start"),
